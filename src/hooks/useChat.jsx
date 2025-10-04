@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { getCompletion, getRankedArticles } from '../utils/api';
 
 export function useChat() {
-	const [messages, setMessages] = useState([]);
+	const [messages, setMessages] = useState([{role: 'system', content: 'You are a research assistant to NASA researchers. You respond with short, to the point, and highly well spoken messages.'}]);
 	const [loading, setLoading] = useState(false);
 	const [articles, setArticles] = useState([]);
 	const [error, setError] = useState(false);
