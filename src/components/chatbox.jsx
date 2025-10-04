@@ -1,12 +1,12 @@
-export default function ChatBox({value, onChange}) {
+export default function ChatBox({ value, onChange }) {
   return (
     <div className="flex flex-col items-center justify-center min-h-full ">
       <div className="w-full max-w-xl">
         <div className="flex items-center rounded-xl bg-gray-800 px-6 py-6 shadow-md">
           <textarea
             value={value}
-            onChange={e => onChange(e.target.value)}
-            className="w-full p-2 border rounded"
+            onChange={(e) => onChange(e.target.value)}
+            className="w-full p-2 border-none rounded resize-none focus:outline-none focus:ring-0"
           />
           {/* Example icons: replace with desired icon components */}
           <span className="mx-3 text-gray-400">

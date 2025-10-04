@@ -1,4 +1,4 @@
-import TheoTest from '../components/TheoTest';
+// import TheoTest from '../components/TheoTest';
 import ChatBox from '../components/chatbox';
 
 function Home() {
