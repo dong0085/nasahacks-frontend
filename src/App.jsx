@@ -4,11 +4,11 @@ import Footer from "./components/Footer";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 import AboutUs from "./pages/AboutUs";
-import TheoTest from "./components/TheoTest"
+import TheoTest from "./components/TheoTest";
 
 export default function App() {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-[#1C2026]">
       <Header />
       <main className="flex-1">
         <div className="mx-auto max-w-7xl px-4 py-6">
