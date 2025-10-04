@@ -4,7 +4,7 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 border-b bg-[#1C2026] backdrop-blur">
       <div className="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
-        <Link to={"/"}>
+        <Link to={"/Home"}>
           <div>
             <h1 className="text-base sm:text-lg font-semibold">
               NASA Research Assistant
