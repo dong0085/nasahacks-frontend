@@ -1,6 +1,15 @@
+import spaceImage from "../assets/space_image1.png";
+
 export default function Footer() {
   return (
-    <footer className="mt-auto border-t bg-[#1C2026]">
+    <footer
+      className="mt-auto border-t"
+      style={{
+        backgroundImage: `linear-gradient(rgba(28,32,38,0.9), rgba(28,32,38,0.9)), url(${spaceImage})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
       <div className="mx-auto max-w-7xl px-4 py-5">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-neutral-200">
           <div className="flex flex-wrap items-center justify-center gap-4">

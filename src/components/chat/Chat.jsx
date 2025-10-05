@@ -102,11 +102,11 @@ export default function Chat({ initialQuery }) {
   }
 
   return (
-    <section className="h-[82vh] md:h-[82vh] w-full flex flex-col gap-3 overflow-hidden md:flex-row">
+    <section className="h-[82vh] md:h-[82vh] w-full flex flex-col gap-3 overflow-hidden md:flex-row min-h-0">
       {!selectedArticle ? (
         <div
           id="main-chat-box"
-          className="h-2/3  md:h-full md:w-2/3 flex flex-col overflow-hidden rounded-2xl border border-[#2A3238] bg-[#1C2026] p-3"
+          className="h-2/3 md:h-full md:w-2/3 flex flex-col overflow-hidden rounded-2xl border border-[#2A3238] bg-[#1C2026] p-3 min-h-0"
         >
           <header
             id="chat-header"
@@ -130,22 +130,19 @@ export default function Chat({ initialQuery }) {
             </span>
           </header>
 
-        <ul
-          id="messages-list"
-          className="flex-1 overflow-y-auto overscroll-y-contain touch-pan-y pr-1 space-y-0.5 justify-end flex flex-col"
+        <div
+          id="messages-scroll-area"
+          className="flex-1 min-h-0 overflow-y-auto overscroll-y-contain touch-pan-y pr-1"
         >
-          {messages.map(
-            (m, i) =>
-              m.role !== "system" && (
-                <MessageBubble
-                  key={i}
-                  msg={m}
-                />
-              )
-          )}
-          {loadingChat && <TypingBubble />}
-          <div ref={bottomRef} />
-        </ul>
+          <ul className="flex flex-col justify-end space-y-0.5">
+            {messages.map(
+              (m, i) =>
+                m.role !== "system" && <MessageBubble key={i} msg={m} />
+            )}
+            {loadingChat && <TypingBubble />}
+            <div ref={bottomRef} />
+          </ul>
+        </div>
 
           <div
             id="chat-input-container"

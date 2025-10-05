@@ -1,6 +1,6 @@
 const apiUrl = import.meta.env.VITE_API_URL;
 
-const USE_DUMMY = false;
+const USE_DUMMY = true;
 
 export const getCompletion = async (messages) => {
   if (USE_DUMMY) {

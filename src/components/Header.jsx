@@ -1,8 +1,16 @@
 import { Link } from "react-router";
+import spaceImage from "../assets/space_image1.png";
 
 export default function Header() {
   return (
-    <header className="sticky top-0 z-50 border-b bg-[#1C2026] backdrop-blur">
+    <header
+      className="sticky top-0 z-50 border-b backdrop-blur"
+      style={{
+        backgroundImage: `linear-gradient(rgba(28,32,38,0.9), rgba(28,32,38,0.9)), url(${spaceImage})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
       <div className="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
         <Link to={"/Home"}>
           <div>
