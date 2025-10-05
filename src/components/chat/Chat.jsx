@@ -130,22 +130,22 @@ export default function Chat({ initialQuery }) {
             </span>
           </header>
 
-          <ul
-            id="messages-list"
-            className="flex-1 overflow-y-auto overscroll-y-contain touch-pan-y pr-1 space-y-0.5 flex flex-col"
-          >
-            {messages.map(
-              (m, i) =>
-                m.role !== "system" && (
-                  <MessageBubble
-                    key={i}
-                    msg={m}
-                  />
-                )
-            )}
-            {loadingChat && <TypingBubble />}
-            <div ref={bottomRef} />
-          </ul>
+        <ul
+          id="messages-list"
+          className="flex-1 overflow-y-auto overscroll-y-contain touch-pan-y pr-1 space-y-0.5 justify-end flex flex-col"
+        >
+          {messages.map(
+            (m, i) =>
+              m.role !== "system" && (
+                <MessageBubble
+                  key={i}
+                  msg={m}
+                />
+              )
+          )}
+          {loadingChat && <TypingBubble />}
+          <div ref={bottomRef} />
+        </ul>
 
           <div
             id="chat-input-container"

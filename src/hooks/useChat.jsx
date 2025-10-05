@@ -14,6 +14,7 @@ const prompts = {
         return `Article ${i + 1}:
 Title: ${a.title}
 Summary: ${a.tl_dr}
+Reason for choosing: ${a.reason}
 Quotes: ${
           Array.isArray(a.quotes)
             ? a.quotes.join("\n- ")
@@ -40,6 +41,28 @@ export function useChat() {
     if (messages > 1) return setStage(1);
     const roll = Math.random();
     if (stage === 0 && roll < 0.3) return setStage(1);
+  };
+
+  const getSuccessMessage = async (articles) => {
+    const count = articles.length;
+    const top = articles[0];
+    console.log(top);
+
+    const sysPrompt = `You are a research assistant for NASA scientists. 
+You have retrieved ${count} articles. 
+Report this to the user in a short, confident message.
+Say how many were retrieved and then state that you selected the first article based on the given reason. 
+Do not invent your own rationale — use exactly what is provided. Be quick, succinct and to the point`;
+
+    const newMessages = [
+      { role: "system", content: sysPrompt },
+      {
+        role: "user",
+        content: `The reason provided for selecting the first article ${top.title}: ${top.reason}`,
+      },
+    ];
+
+    return await getCompletion(newMessages);
   };
 
   const makePrompt = async (prompt) => {
@@ -79,8 +102,14 @@ export function useChat() {
     setLoadingArticles(true);
     try {
       const results = await getRankedArticles(messages);
+      console.log(results);
       setArticles(results);
       setStage(2);
+      const successMessage = await getSuccessMessage(results);
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: successMessage },
+      ]);
     } catch (err) {
       console.error("Error fetching articles:", err);
       setError(true);
