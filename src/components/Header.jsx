@@ -15,13 +15,8 @@ export default function Header() {
           </div>
         </Link>
         <div>
-          <Link to={"/Home"}>
-            <button className="rounded-lg px-3 py-1.5 text-sm cursor-pointer">
-              New Chat
-            </button>
-          </Link>
           <Link to={"/About"}>
-            <button className="rounded-lg px-3 py-1.5 text-sm cursor-pointer">
+            <button className="rounded-lg px-3 py-1.5 text-sm cursor-pointer hover:underline">
               About us
             </button>
           </Link>

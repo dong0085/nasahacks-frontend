@@ -16,12 +16,12 @@ function Home() {
   };
 
   return (
-    <div className="flex-1">
+    <div className="flex-1 flex">
       {!showChat ? (
-        <div className="flex items-center justify-center min-h-[72vh]">
+        <div className="flex flex-1 items-center justify-center">
           <form
             onSubmit={submit}
-            className="w-full max-w-xl bg-[#1C2026] p-6 rounded-2xl border border-[#2A3238] shadow"
+            className="w-full flex-1  max-w-xl bg-[#1C2026] p-6 rounded-2xl border border-[#2A3238] shadow"
           >
             <label className="block text-sm text-[#C9C9C9] mb-2">
               Enter your research query
