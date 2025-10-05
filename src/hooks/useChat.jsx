@@ -1,46 +1,150 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { getCompletion, getRankedArticles } from "../utils/api";
 
 const prompts = {
-  0: () =>
-    "You are a research assistant for NASA scientists. At this stage, your role is to ask concise, professional follow-up questions that help narrow down the researcher’s intent, while also summarizing their focus back in precise terms. Avoid speculation or providing resources. Confirm scope so alignment is clear before retrieval.",
+  casual: {
+    0: () =>
+      "You are a NASA research helper in casual mode. Ask light, simple follow-up questions in plain language to clarify what the user wants. Summarize their intent back in an easy, approachable way. Avoid jargon.",
+    1: () =>
+      "You are in casual mode. Announce that you are retrieving articles in a clear, friendly, and brief way. Keep it simple and approachable.",
+    2: (articles) => {
+      const formatted = articles
+        .map(
+          (a, i) => `Article ${i + 1}:
+Title: ${a.title}
+Summary: ${a.tl_dr}
+Reason for choosing: ${a.reason}`
+        )
+        .join("\n\n");
 
-  1: () =>
-    "You are a research assistant for NASA scientists. At this stage, you have enough context and now begin retrieving the most relevant articles. Respond in a professional, confident tone that you are initiating the search (e.g., “Retrieving the most relevant articles based on your request...”). Keep it short and authoritative.",
+      return `You are in casual mode. Only answer based on these 5 articles. Keep responses straightforward and avoid overly technical phrasing.\n\n${formatted}`;
+    },
+    success: (count) =>
+      `You are in casual mode. You have retrieved ${count} articles. Report this in a short, clear, and simple message, then note that the first was selected for the provided reason.`,
+  },
 
-  2: (articles) => {
-    const formatted = articles
-      .map((a, i) => {
-        return `Article ${i + 1}:
+  standard: {
+    0: () =>
+      "You are a research assistant for NASA scientists. Ask concise, professional follow-up questions to refine the user’s intent. Summarize their scope back precisely. Avoid speculation.",
+    1: () =>
+      "You are a NASA research assistant. You now have enough context and are retrieving the most relevant articles. State this in a confident, professional way.",
+    2: (articles) => {
+      const formatted = articles
+        .map(
+          (a, i) => `Article ${i + 1}:
 Title: ${a.title}
 Summary: ${a.tl_dr}
 Reason for choosing: ${a.reason}
 Quotes: ${
-          Array.isArray(a.quotes)
-            ? a.quotes.join("\n- ")
-            : JSON.stringify(a.quotes)
-        }`;
-      })
-      .join("\n\n");
+            Array.isArray(a.quotes)
+              ? a.quotes.join("\n- ")
+              : JSON.stringify(a.quotes)
+          }`
+        )
+        .join("\n\n");
 
-    return `You are a research assistant for NASA scientists. You will respond to questions about the following 5 articles to the best of your ability. Base your answers only on the provided content.
+      return `You are a NASA research assistant. Answer questions strictly from the following 5 articles:\n\n${formatted}`;
+    },
+    success: (count) =>
+      `You are a NASA research assistant. You have retrieved ${count} articles. Report this clearly and state that you selected the first one for the given reason.`,
+  },
 
-${formatted}`;
+  advanced: {
+    0: () =>
+      "You are in advanced mode. Probe with minimal, precise follow-up questions. Summarize the research intent in technical terms only. No extra words.",
+    1: () =>
+      "You are in advanced mode. Indicate retrieval of relevant literature in a terse, authoritative tone.",
+    2: (articles) => {
+      const formatted = articles
+        .map(
+          (a, i) => `Article ${i + 1}:
+${a.title}
+Summary: ${a.tl_dr}
+Reason: ${a.reason}`
+        )
+        .join("\n\n");
+
+      return `You are in advanced mode. Respond only with content derived from these 5 articles. Keep answers concise and technical.\n\n${formatted}`;
+    },
+    success: (count) =>
+      `You are in advanced mode. ${count} articles retrieved. Report count succinctly and note the first article was selected for the provided reason.`,
   },
 };
 
 export function useChat() {
-  const [stage, setStage] = useState(0);
   const [messages, setMessages] = useState([]);
   const [loadingChat, setLoadingChat] = useState(false);
   const [loadingArticles, setLoadingArticles] = useState(false);
   const [articles, setArticles] = useState([]);
   const [error, setError] = useState(false);
+  const [mode, setMode] = useState("casual");
+  const stageRef = useRef(0);
 
   const maybeAdvanceStage = (messages) => {
-    if (messages > 1) return setStage(1);
+    if (messages > 2) {
+      return true;
+    }
     const roll = Math.random();
-    if (stage === 0 && roll < 0.3) return setStage(1);
+    if (messages && roll < 0.3) {
+      return true;
+    }
+    return false;
+  };
+
+  const makePrompt = async (prompt) => {
+    setLoadingChat(true);
+
+    try {
+      // If we’re in stage 0, check if we should advance
+      setMessages((prev) => [...prev, { role: "user", content: prompt }]);
+      if (stageRef.current === 0) {
+        const userMessages = messages.filter((m) => m.role === "user");
+        const shouldAdvance = maybeAdvanceStage(userMessages.length + 1);
+
+        if (shouldAdvance) {
+          stageRef.current = 1;
+
+          // fire off the stage 1 announcement
+          const announceMessages = [
+            { role: "system", content: prompts[mode][1]() },
+            ...messages.filter((m) => m.role !== "system"),
+            { role: "user", content: "Proceed with retrieval." },
+          ];
+
+          const announceCompletion = await getCompletion(announceMessages);
+
+          setMessages((prev) => [
+            ...prev,
+            { role: "assistant", content: announceCompletion },
+          ]);
+
+          // now kick off article fetch → will bump stage to 2
+          await fetchArticles();
+          return; // exit early so we don’t process this as a stage 0 turn
+        }
+      }
+
+      // otherwise: normal flow for current stage
+      const newMessages = [
+        { role: "system", content: prompts[mode][stageRef.current](articles) },
+        ...messages.filter((m) => m.role !== "system"),
+        { role: "user", content: prompt },
+      ];
+
+      setMessages(newMessages);
+
+      const completion = await getCompletion(newMessages);
+
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: completion },
+      ]);
+    } catch (err) {
+      console.error(err);
+      setError(true);
+    } finally {
+      setLoadingChat(false);
+    }
   };
 
   const getSuccessMessage = async (articles) => {
@@ -48,14 +152,8 @@ export function useChat() {
     const top = articles[0];
     console.log(top);
 
-    const sysPrompt = `You are a research assistant for NASA scientists. 
-You have retrieved ${count} articles. 
-Report this to the user in a short, confident message.
-Say how many were retrieved and then state that you selected the first article based on the given reason. 
-Do not invent your own rationale — use exactly what is provided. Be quick, succinct and to the point`;
-
     const newMessages = [
-      { role: "system", content: sysPrompt },
+      { role: "system", content: prompts[mode].success(count) },
       {
         role: "user",
         content: `The reason provided for selecting the first article ${top.title}: ${top.reason}`,
@@ -65,46 +163,13 @@ Do not invent your own rationale — use exactly what is provided. Be quick, suc
     return await getCompletion(newMessages);
   };
 
-  const makePrompt = async (prompt) => {
-    const newMessages = [
-      { role: "system", content: prompts[stage](articles) },
-      ...messages.filter((m) => m.role !== "system"),
-      { role: "user", content: `${prompt}` },
-    ];
-    setMessages(newMessages);
-    setLoadingChat(true);
-
-    try {
-      const completion = await getCompletion(newMessages);
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: completion },
-      ]);
-
-      // randomly advance stage, but if more than 3 user messages go get article
-      if (stage === 0) {
-        const userMessages = messages.filter((m) => m.role === "user");
-        maybeAdvanceStage(userMessages.length + 1);
-      }
-
-      if (stage === 1) {
-        await fetchArticles();
-      }
-    } catch (err) {
-      console.error(err);
-      setError(true);
-    } finally {
-      setLoadingChat(false);
-    }
-  };
-
   const fetchArticles = async () => {
     setLoadingArticles(true);
     try {
       const results = await getRankedArticles(messages);
       console.log(results);
       setArticles(results);
-      setStage(2);
+      stageRef.current = 2;
       const successMessage = await getSuccessMessage(results);
       setMessages((prev) => [
         ...prev,
@@ -120,7 +185,7 @@ Do not invent your own rationale — use exactly what is provided. Be quick, suc
 
   const reset = () => {
     setMessages([]);
-    setStage(0);
+    stageRef.current = 0;
     setArticles([]);
   };
 
