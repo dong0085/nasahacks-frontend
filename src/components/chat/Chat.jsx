@@ -102,8 +102,8 @@ export default function Chat({ initialQuery }) {
 
   return (
     <section className="grid gap-4 h-[72vh] min-h-0 lg:grid-cols-[minmax(0,1fr)_320px]">
-      <div className="rounded-2xl border border-[#2A3238] bg-[#1C2026] p-3 flex flex-col overflow-hidden">
-        <header className="mb-3 flex items-center justify-between gap-2 border-b border-[#2A3238] pb-3">
+      <div id="main-chat-box" className="rounded-2xl border border-[#2A3238] bg-[#1C2026] p-3 flex flex-col overflow-hidden">
+        <header id="chat-header" className="mb-3 flex items-center justify-between gap-2 border-b border-[#2A3238] pb-3">
           <div>
             <p className="text-[11px] uppercase tracking-wide text-[#9AA4AB]">
               Conversation
@@ -120,7 +120,7 @@ export default function Chat({ initialQuery }) {
           </span>
         </header>
 
-        <ul className="flex-1 overflow-y-auto overscroll-y-contain touch-pan-y pr-1 space-y-0.5 flex flex-col">
+        <ul id="messages-list" className="flex-1 overflow-y-auto overscroll-y-contain touch-pan-y pr-1 space-y-0.5 flex flex-col">
           {messages.map(
             (m, i) => m.role !== 'system' && <MessageBubble key={i} msg={m} />
           )}
@@ -128,7 +128,7 @@ export default function Chat({ initialQuery }) {
           <div ref={bottomRef} />
         </ul>
 
-        <div className="pt-3">
+        <div id="chat-input-container" className="pt-3">
           <ChatInput onSend={handleSend} disabled={loading} />
           <div className="mt-2 flex flex-wrap items-center justify-between text-[11px] text-[#9AA4AB]">
             <span>Enter to send • Shift+Enter for newline</span>
@@ -144,7 +144,7 @@ export default function Chat({ initialQuery }) {
           </div>
         </div>
 
-        <div className="mt-4 rounded-2xl border border-[#2A3238] bg-[#161B21] p-4 lg:hidden">
+        <div id="mobile-references" className="mt-4 rounded-2xl border border-[#2A3238] bg-[#161B21] p-4 lg:hidden">
           <div className="mb-2 flex items-center justify-between">
             <h2 className="text-sm font-semibold text-[#E6E8EA]">References</h2>
             <button
@@ -161,8 +161,8 @@ export default function Chat({ initialQuery }) {
         </div>
       </div>
 
-      <aside className="hidden lg:flex flex-col rounded-2xl border border-[#2A3238] bg-[#161B21] p-4 overflow-hidden">
-        <div className="flex items-center justify-between gap-2">
+      <aside id="references-panel" className="hidden lg:flex flex-col rounded-2xl border border-[#2A3238] bg-[#161B21] p-4 overflow-hidden">
+        <div id="references-header" className="flex items-center justify-between gap-2">
           <div>
             <p className="text-[11px] uppercase tracking-wide text-[#9AA4AB]">
               References
@@ -172,6 +172,7 @@ export default function Chat({ initialQuery }) {
             </h2>
           </div>
           <button
+            id="refresh-sources-button"
             type="button"
             onClick={fetchArticles}
             disabled={loading}
@@ -181,7 +182,7 @@ export default function Chat({ initialQuery }) {
             <FiRefreshCw className={loading ? 'animate-spin' : ''} />
           </button>
         </div>
-        <div className="mt-4 flex-1 overflow-y-auto pr-1">{renderArticles()}</div>
+        <div id="references-list" className="mt-4 flex-1 overflow-y-auto pr-1">{renderArticles()}</div>
       </aside>
     </section>
   );
