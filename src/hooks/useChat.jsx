@@ -85,7 +85,7 @@ export function useChat() {
       return true;
     }
     const roll = Math.random();
-    if (messages && roll < 0.3) {
+    if (messages > 2 && roll < 0.3) {
       return true;
     }
     return false;
