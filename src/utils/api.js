@@ -1,6 +1,6 @@
 const apiUrl = import.meta.env.VITE_API_URL;
 
-const USE_DUMMY = true;
+const USE_DUMMY = false;
 
 export const getCompletion = async (messages) => {
   if (USE_DUMMY) {
@@ -9,7 +9,7 @@ export const getCompletion = async (messages) => {
         resolve(
           "This is a dummy chat response, you need to set USE_DUMMY in /utils/api.js to false to get real completions"
         );
-      }, 1 * 1000);
+      }, 1 * 100);
     });
   }
 
@@ -75,7 +75,7 @@ export const getRankedArticles = async (messages) => {
             dummyArticle,
             dummyArticle,
           ]);
-        }, 10000);
+        }, 100);
       });
 
     const res = await fetch(`${apiUrl}/search`, {

@@ -2,9 +2,30 @@ import { useState } from "react";
 import { getCompletion, getRankedArticles } from "../utils/api";
 
 const prompts = {
-  0: "You are a research assistant for NASA scientists. At this stage, your role is to ask concise, professional follow-up questions that help narrow down the researcher’s intent, while also summarizing their focus back in precise terms. Avoid speculation or providing resources. Confirm scope so alignment is clear before retrieval.",
-  1: "You are a research assistant for NASA scientists. At this stage, you have enough context and now begin retrieving the most relevant articles. Respond in a professional, confident tone that you are initiating the search (e.g., “Retrieving the most relevant articles based on your request...”). Keep it short and authoritative.",
-  2: "You are an imaginary friend, who is pretending to be real",
+  0: () =>
+    "You are a research assistant for NASA scientists. At this stage, your role is to ask concise, professional follow-up questions that help narrow down the researcher’s intent, while also summarizing their focus back in precise terms. Avoid speculation or providing resources. Confirm scope so alignment is clear before retrieval.",
+
+  1: () =>
+    "You are a research assistant for NASA scientists. At this stage, you have enough context and now begin retrieving the most relevant articles. Respond in a professional, confident tone that you are initiating the search (e.g., “Retrieving the most relevant articles based on your request...”). Keep it short and authoritative.",
+
+  2: (articles) => {
+    const formatted = articles
+      .map((a, i) => {
+        return `Article ${i + 1}:
+Title: ${a.title}
+Summary: ${a.tl_dr}
+Quotes: ${
+          Array.isArray(a.quotes)
+            ? a.quotes.join("\n- ")
+            : JSON.stringify(a.quotes)
+        }`;
+      })
+      .join("\n\n");
+
+    return `You are a research assistant for NASA scientists. You will respond to questions about the following 5 articles to the best of your ability. Base your answers only on the provided content.
+
+${formatted}`;
+  },
 };
 
 export function useChat() {
@@ -23,9 +44,9 @@ export function useChat() {
 
   const makePrompt = async (prompt) => {
     const newMessages = [
-      { role: "system", content: prompts[stage] },
+      { role: "system", content: prompts[stage](articles) },
       ...messages.filter((m) => m.role !== "system"),
-      { role: "user", content: `${prompt} ${stage}` },
+      { role: "user", content: `${prompt}` },
     ];
     setMessages(newMessages);
     setLoadingChat(true);

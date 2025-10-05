@@ -169,7 +169,7 @@ export default function Chat({ initialQuery }) {
               disabled={loadingArticles || loadingChat || messages.length <= 1}
               className={`inline-flex items-center gap-1 rounded-lg border border-[#2A3238] px-2.5 py-1 text-xs text-[#E6E8EA] 
     hover:border-[#379DA6] hover:text-[#379DA6] 
-    disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none lg:hidden`}
+    disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none`}
             >
               New inquiry
             </button>
