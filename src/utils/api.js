@@ -2,7 +2,7 @@ import OpenAI from 'openai';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
-const USE_DUMMY = false;
+const USE_DUMMY = true;
 
 export const getCompletion = async (messages) => {
 	if (USE_DUMMY) return 'This is a dummy chat response, you need to set USE_DUMMY in /utils/api.js to false to get real completions';
