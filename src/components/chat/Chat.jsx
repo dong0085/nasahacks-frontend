@@ -138,7 +138,7 @@ export default function Chat({ initialQuery }) {
 
         <ul
           id="messages-list"
-          className="flex-1 overflow-y-auto overscroll-y-contain touch-pan-y pr-1 space-y-0.5 flex flex-col"
+          className="flex-1 overflow-y-auto overscroll-y-contain touch-pan-y pr-1 space-y-0.5 justify-end flex flex-col"
         >
           {messages.map(
             (m, i) =>
