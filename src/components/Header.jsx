@@ -15,10 +15,10 @@ export default function Header() {
         <Link to={"/Home"}>
           <div>
             <h1 className="text-base sm:text-lg font-semibold">
-              NASA Research Assistant
+              Nucleus - NASA Research Librarian
             </h1>
             <p className="text-xs text-[#9CA3AF]">
-              Explore Space Research Papers
+              Explore Unknown
             </p>
           </div>
         </Link>
