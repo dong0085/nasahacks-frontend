@@ -15,13 +15,21 @@ export default function Chat({ initialQuery }) {
     loadingArticles,
     reset,
     mode,
-    setMode
+    setMode,
   } = useChat();
   const bottomRef = useRef(null);
-  const hasSentInitial = useRef(false);
   const [selectedArticle, setSelectedArticle] = useState(null);
 
   const hasArticles = articles.length > 0;
+
+  const firedRef = useRef(false);
+
+  useEffect(() => {
+    if (initialQuery && !firedRef.current) {
+      firedRef.current = true;
+      makePrompt(initialQuery);
+    }
+  }, [initialQuery, makePrompt]);
 
   const renderArticles = () => {
     if (loadingArticles && !hasArticles) {
@@ -83,14 +91,6 @@ export default function Chat({ initialQuery }) {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loadingChat]);
 
-  useEffect(() => {
-    if (initialQuery && !hasSentInitial.current) {
-      hasSentInitial.current = true;
-      makePrompt(initialQuery);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialQuery]);
-
   if (error) {
     return (
       <section className="grid gap-4 flex flex-1 min-h-0 lg:grid-cols-[minmax(0,1fr)_320px]">
@@ -123,8 +123,17 @@ export default function Chat({ initialQuery }) {
               </h2>
             </div>
             <span className="flex gap-3 ">
-              {['Casual', 'Standard', 'Advanced'].map((m, i )=> (
-                <button onClick={() => {setMode(m.toLowerCase())}} key={i} disabled={m.toLowerCase() === mode} className={`disabled:opacity-100 disabled:pointer-events-none opacity-50 hover:opacity-75 text-[12px] align-bottom`}>{m}</button>
+              {["Casual", "Standard", "Advanced"].map((m, i) => (
+                <button
+                  onClick={() => {
+                    setMode(m.toLowerCase());
+                  }}
+                  key={i}
+                  disabled={m.toLowerCase() === mode}
+                  className={`disabled:opacity-100 disabled:pointer-events-none opacity-50 hover:opacity-75 text-[12px] align-bottom`}
+                >
+                  {m}
+                </button>
               ))}
             </span>
             <span className="inline-flex items-center gap-2 rounded-full border border-[#2A3238] px-3 py-1 text-[11px] text-[#9AA4AB]">
@@ -141,7 +150,7 @@ export default function Chat({ initialQuery }) {
             id="messages-scroll-area"
             className="flex-1 min-h-0 overflow-y-auto overscroll-y-contain touch-pan-y pr-1"
           >
-            <ul className="flex flex-col justify-end space-y-0.5">
+            <ul className="flex flex-col space-y-0.5">
               {messages.map(
                 (m, i) =>
                   m.role !== "system" && (
@@ -152,24 +161,6 @@ export default function Chat({ initialQuery }) {
                   )
               )}
               {loadingChat && <TypingBubble />}
-              <div
-                id="messages-scroll-area"
-                className="flex-1 min-h-0 overflow-y-auto overscroll-y-contain touch-pan-y pr-1"
-              >
-                <ul className="flex flex-col justify-end space-y-0.5">
-                  {messages.map(
-                    (m, i) =>
-                      m.role !== "system" && (
-                        <MessageBubble
-                          key={i}
-                          msg={m}
-                        />
-                      )
-                  )}
-                  {loadingChat && <TypingBubble />}
-                  <div ref={bottomRef} />
-                </ul>
-              </div>
               <div ref={bottomRef} />
             </ul>
           </div>
