@@ -130,19 +130,42 @@ export default function Chat({ initialQuery }) {
             </span>
           </header>
 
-        <div
-          id="messages-scroll-area"
-          className="flex-1 min-h-0 overflow-y-auto overscroll-y-contain touch-pan-y pr-1"
-        >
-          <ul className="flex flex-col justify-end space-y-0.5">
-            {messages.map(
-              (m, i) =>
-                m.role !== "system" && <MessageBubble key={i} msg={m} />
-            )}
-            {loadingChat && <TypingBubble />}
-            <div ref={bottomRef} />
-          </ul>
-        </div>
+          <div
+            id="messages-scroll-area"
+            className="flex-1 min-h-0 overflow-y-auto overscroll-y-contain touch-pan-y pr-1"
+          >
+            <ul className="flex flex-col justify-end space-y-0.5">
+              {messages.map(
+                (m, i) =>
+                  m.role !== "system" && (
+                    <MessageBubble
+                      key={i}
+                      msg={m}
+                    />
+                  )
+              )}
+              {loadingChat && <TypingBubble />}
+              <div
+                id="messages-scroll-area"
+                className="flex-1 min-h-0 overflow-y-auto overscroll-y-contain touch-pan-y pr-1"
+              >
+                <ul className="flex flex-col justify-end space-y-0.5">
+                  {messages.map(
+                    (m, i) =>
+                      m.role !== "system" && (
+                        <MessageBubble
+                          key={i}
+                          msg={m}
+                        />
+                      )
+                  )}
+                  {loadingChat && <TypingBubble />}
+                  <div ref={bottomRef} />
+                </ul>
+              </div>
+              <div ref={bottomRef} />
+            </ul>
+          </div>
 
           <div
             id="chat-input-container"
@@ -157,7 +180,9 @@ export default function Chat({ initialQuery }) {
               <button
                 type="button"
                 onClick={reset}
-                disabled={loadingArticles || loadingChat || messages.length <= 1}
+                disabled={
+                  loadingArticles || loadingChat || messages.length <= 1
+                }
                 className={`inline-flex items-center gap-1 rounded-lg border border-[#2A3238] px-2.5 py-1 text-xs text-[#E6E8EA] 
     hover:border-[#379DA6] hover:text-[#379DA6] 
     disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none`}
@@ -187,8 +212,8 @@ export default function Chat({ initialQuery }) {
                 {selectedArticle.title ?? "Untitled source"}
               </h2>
               <div className="flex flex-col items-baseline gap-1">
-                
-                {Array.isArray(selectedArticle.tags) && selectedArticle.tags.length > 0 ? (
+                {Array.isArray(selectedArticle.tags) &&
+                selectedArticle.tags.length > 0 ? (
                   <ul className="flex flex-wrap justify-center gap-2">
                     {selectedArticle.tags.slice(0, 12).map((tag, idx) => (
                       <li
@@ -207,7 +232,10 @@ export default function Chat({ initialQuery }) {
                 )}
               </div>
             </div>
-            <span aria-hidden className="h-8 w-8" />
+            <span
+              aria-hidden
+              className="h-8 w-8"
+            />
           </div>
 
           <div className="flex-1 min-h-0 overflow-y-auto pr-1">

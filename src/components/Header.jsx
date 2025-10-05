@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import spaceImage from "../assets/space_image1.png";
+import spaceImage from "../assets/space_image1.jpg";
 
 export default function Header() {
   return (

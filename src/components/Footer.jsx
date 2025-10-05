@@ -1,4 +1,4 @@
-import spaceImage from "../assets/space_image1.png";
+import spaceImage from "../assets/space_image1.jpg";
 
 export default function Footer() {
   return (
