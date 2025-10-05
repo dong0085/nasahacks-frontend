@@ -1,8 +1,6 @@
-import OpenAI from "openai";
-
 const apiUrl = import.meta.env.VITE_API_URL;
 
-const USE_DUMMY = false;
+const USE_DUMMY = true;
 
 export const getCompletion = async (messages) => {
   if (USE_DUMMY) {
@@ -11,7 +9,7 @@ export const getCompletion = async (messages) => {
         resolve(
           "This is a dummy chat response, you need to set USE_DUMMY in /utils/api.js to false to get real completions"
         );
-      }, 1 * 1000); 
+      }, 1 * 1000);
     });
   }
 
@@ -68,13 +66,17 @@ const dummyArticle = {
 export const getRankedArticles = async (messages) => {
   try {
     if (USE_DUMMY)
-      return [
-        dummyArticle,
-        dummyArticle,
-        dummyArticle,
-        dummyArticle,
-        dummyArticle,
-      ];
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve([
+            dummyArticle,
+            dummyArticle,
+            dummyArticle,
+            dummyArticle,
+            dummyArticle,
+          ]);
+        }, 10000);
+      });
 
     const res = await fetch(`${apiUrl}/search`, {
       method: "POST",

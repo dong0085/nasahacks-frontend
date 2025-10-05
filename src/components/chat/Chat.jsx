@@ -6,15 +6,22 @@ import { useChat } from "../../hooks/useChat";
 import { FiChevronRight, FiRefreshCw } from "react-icons/fi";
 
 export default function Chat({ initialQuery }) {
-  const { messages, articles, makePrompt, error, loading, fetchArticles } =
-    useChat();
+  const {
+    messages,
+    articles,
+    makePrompt,
+    error,
+    loadingChat,
+    loadingArticles,
+		reset,
+  } = useChat();
   const bottomRef = useRef(null);
   const hasSentInitial = useRef(false);
 
   const hasArticles = articles.length > 0;
 
   const renderArticles = () => {
-    if (loading && !hasArticles) {
+    if (loadingArticles && !hasArticles) {
       return (
         <p className="text-sm text-[#9AA4AB]">Searching NASA literature…</p>
       );
@@ -79,7 +86,7 @@ export default function Chat({ initialQuery }) {
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, loading]);
+  }, [messages, loadingChat]);
 
   useEffect(() => {
     if (initialQuery && !hasSentInitial.current) {
@@ -122,7 +129,7 @@ export default function Chat({ initialQuery }) {
           <span className="inline-flex items-center gap-2 rounded-full border border-[#2A3238] px-3 py-1 text-[11px] text-[#9AA4AB]">
             <span
               className={`h-2 w-2 rounded-full ${
-                loading ? "bg-[#379DA6] animate-pulse" : "bg-[#38F8AC]"
+                loadingChat ? "bg-[#379DA6] animate-pulse" : "bg-[#38F8AC]"
               }`}
             />
             Live
@@ -142,7 +149,7 @@ export default function Chat({ initialQuery }) {
                 />
               )
           )}
-          {loading && <TypingBubble />}
+          {loadingChat && <TypingBubble />}
           <div ref={bottomRef} />
         </ul>
 
@@ -152,20 +159,19 @@ export default function Chat({ initialQuery }) {
         >
           <ChatInput
             onSend={makePrompt}
-            disabled={loading}
+            disabled={loadingArticles || loadingChat}
           />
           <div className="mt-2 flex flex-wrap items-center justify-between text-[11px] text-[#9AA4AB]">
             <span>Enter to send • Shift+Enter for newline</span>
             <button
               type="button"
-              onClick={() => {
-                console.log("do something here");
-              }}
-              disabled={loading}
-              className="inline-flex items-center gap-1 rounded-lg border border-[#2A3238] px-2.5 py-1 text-xs text-[#E6E8EA] hover:border-[#379DA6] hover:text-[#379DA6] disabled:opacity-40 lg:hidden"
+              onClick={reset}
+              disabled={loadingArticles || loadingChat || messages.length <= 1}
+              className={`inline-flex items-center gap-1 rounded-lg border border-[#2A3238] px-2.5 py-1 text-xs text-[#E6E8EA] 
+    hover:border-[#379DA6] hover:text-[#379DA6] 
+    disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none lg:hidden`}
             >
-              <FiRefreshCw className={loading ? "animate-spin" : ""} />
-              Refresh sources
+              New inquiry
             </button>
           </div>
         </div>
@@ -187,16 +193,15 @@ export default function Chat({ initialQuery }) {
               Suggested papers
             </h2>
           </div>
-          <button
+          <span
             id="refresh-sources-button"
-            type="button"
-            onClick={fetchArticles}
-            disabled={loading}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#2A3238] text-[#E6E8EA] hover:border-[#379DA6] hover:text-[#379DA6] disabled:opacity-40"
+            className={`inline-flex h-9 w-9 items-center justify-center rounded-lg  text-[#E6E8EA] ${
+              loadingArticles && "opacity-100"
+            } opacity-0`}
             aria-label="Refresh sources"
           >
-            <FiRefreshCw className={loading ? "animate-spin" : ""} />
-          </button>
+            <FiRefreshCw className={loadingArticles ? "animate-spin" : ""} />
+          </span>
         </div>
         <div
           id="references-list"
