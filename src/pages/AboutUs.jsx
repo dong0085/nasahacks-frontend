@@ -84,7 +84,9 @@ function AboutUs() {
         </section>
 
         <section className="space-y-3 rounded-2xl border border-[#2A3238] bg-[#1A2229] p-6 md:p-8">
-          <h3 className="text-xl font-semibold text-[#E6E8EA]">On the horizon</h3>
+          <h3 className="text-xl font-semibold text-[#E6E8EA]">
+            On the horizon
+          </h3>
           <p className="text-sm md:text-base">
             We are lining up focused upgrades to deepen trust in each answer and
             make dense terminology easier to parse mid-conversation.
