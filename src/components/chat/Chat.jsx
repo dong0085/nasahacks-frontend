@@ -102,7 +102,7 @@ export default function Chat({ initialQuery }) {
   }
 
   return (
-    <section className="h-[84vh] md:h-[86vh] w-full flex flex-col gap-3 py-6 overflow-hidden md:flex-row">
+    <section className="h-[82vh] md:h-[82vh] w-full flex flex-col gap-3 overflow-hidden md:flex-row">
       {!selectedArticle ? (
         <div
           id="main-chat-box"
@@ -175,7 +175,7 @@ export default function Chat({ initialQuery }) {
           id="article-details"
           className="h-2/3 md:h-full md:w-2/3 flex flex-col min-h-0 overflow-hidden rounded-2xl border border-[#2A3238] bg-[#1C2026] p-3"
         >
-          <div className="mb-3 grid grid-cols-[auto,1fr,auto] items-center gap-2 border-b border-[#2A3238] pb-3">
+          <div className="mb-3 grid grid-cols-[auto,1fr,auto] items-start gap-2 border-b border-[#2A3238] pb-3">
             <button
               type="button"
               onClick={() => setSelectedArticle(null)}
@@ -185,7 +185,7 @@ export default function Chat({ initialQuery }) {
             >
               <FiChevronLeft />
             </button>
-            <h2 className="text-sm font-semibold text-[#E6E8EA] text-center truncate">
+            <h2 className="text-base font-bold text-[#E6E8EA] text-center leading-snug break-words">
               {selectedArticle.title ?? "Untitled source"}
             </h2>
             <span aria-hidden className="h-8 w-8" />
@@ -234,6 +234,29 @@ export default function Chat({ initialQuery }) {
               <p className="mt-2 text-sm text-[#C9C9C9] whitespace-pre-wrap">
                 {selectedArticle.abstract ?? "—"}
               </p>
+            </div>
+
+            <div className="mt-6">
+              <h3 className="text-xs uppercase tracking-wide text-[#9AA4AB]">
+                Tags
+              </h3>
+              {Array.isArray(selectedArticle.tags) && selectedArticle.tags.length > 0 ? (
+                <ul className="mt-2 flex flex-wrap gap-2">
+                  {selectedArticle.tags.slice(0, 12).map((tag, idx) => (
+                    <li
+                      key={`${tag}-${idx}`}
+                      className="inline-flex items-center gap-1 rounded-full border border-[#379DA6]/40 bg-[#19262E] px-3 py-1 text-xs font-medium uppercase tracking-wide text-[#8BE0E8]"
+                    >
+                      <span className="text-[#379DA6]">#</span>
+                      {tag}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-2 text-sm text-[#525C65]">
+                  No tags yet—consider adding some keywords for quick recall.
+                </p>
+              )}
             </div>
           </div>
         </div>
