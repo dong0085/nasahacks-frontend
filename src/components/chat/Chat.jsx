@@ -14,6 +14,8 @@ export default function Chat({ initialQuery }) {
     loadingChat,
     loadingArticles,
     reset,
+    mode,
+    setMode
   } = useChat();
   const bottomRef = useRef(null);
   const hasSentInitial = useRef(false);
@@ -120,6 +122,11 @@ export default function Chat({ initialQuery }) {
                 NASA Research Assistant
               </h2>
             </div>
+            <span className="flex gap-3 ">
+              {['Casual', 'Standard', 'Advanced'].map((m, i )=> (
+                <button onClick={() => {setMode(m.toLowerCase())}} key={i} disabled={m.toLowerCase() === mode} className={`disabled:opacity-100 disabled:pointer-events-none opacity-50 hover:opacity-75 text-[12px] align-bottom`}>{m}</button>
+              ))}
+            </span>
             <span className="inline-flex items-center gap-2 rounded-full border border-[#2A3238] px-3 py-1 text-[11px] text-[#9AA4AB]">
               <span
                 className={`h-2 w-2 rounded-full ${

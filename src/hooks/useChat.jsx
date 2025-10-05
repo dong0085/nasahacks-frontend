@@ -77,7 +77,7 @@ export function useChat() {
   const [loadingArticles, setLoadingArticles] = useState(false);
   const [articles, setArticles] = useState([]);
   const [error, setError] = useState(false);
-  const [mode, setMode] = useState("casual");
+  const [mode, setMode] = useState("standard");
   const stageRef = useRef(0);
 
   const maybeAdvanceStage = (messages) => {
@@ -106,7 +106,15 @@ export function useChat() {
 
           // fire off the stage 1 announcement
           const announceMessages = [
-            { role: "system", content: prompts[mode][1]() },
+            {
+              role: "system",
+              content: `Main Prompt: ${prompts[mode][1]()} STRICT RULES:
+- You are NOT allowed to answer the user’s question. 
+- You are NOT allowed to provide facts, lists, or background information. 
+- You are ONLY allowed to do what the prompt above describes (ask follow-ups, reflect intent, announce retrieval, etc.).
+- If the user asks for information, you must redirect by asking a clarifying question or restating their intent instead.
+- Do not invent or add anything extra.`,
+            },
             ...messages.filter((m) => m.role !== "system"),
             { role: "user", content: "Proceed with retrieval." },
           ];
@@ -126,7 +134,10 @@ export function useChat() {
 
       // otherwise: normal flow for current stage
       const newMessages = [
-        { role: "system", content: prompts[mode][stageRef.current](articles) },
+        {
+          role: "system",
+          content: prompts[mode][stageRef.current](articles),
+        },
         ...messages.filter((m) => m.role !== "system"),
         { role: "user", content: prompt },
       ];
@@ -198,5 +209,7 @@ export function useChat() {
     makePrompt,
     fetchArticles,
     reset,
+    mode,
+    setMode,
   };
 }
