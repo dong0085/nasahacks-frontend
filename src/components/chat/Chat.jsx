@@ -246,6 +246,35 @@ export default function Chat({ initialQuery }) {
                     return `${list.join(", ")}, et al.`;
                   })()}
                 </p>
+
+                <div>
+                  <h4 className="text-xs uppercase tracking-wide text-[#9AA4AB]">
+                    Year
+                  </h4>
+                  <p className="text-sm text-[#C9C9C9]">
+                    {selectedArticle.year ?? "—"}
+                  </p>
+                </div>
+
+                <div>
+                  <h4 className="text-xs uppercase tracking-wide text-[#9AA4AB]">
+                    DOI
+                  </h4>
+                  <p className="text-sm text-[#379DA6]">
+                    {selectedArticle.doi ? (
+                      <a
+                        href={`https://doi.org/${selectedArticle.doi}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:underline"
+                      >
+                        {selectedArticle.doi}
+                      </a>
+                    ) : (
+                      <span className="text-[#C9C9C9]">—</span>
+                    )}
+                  </p>
+                </div>
               </div>
             </div>
 
