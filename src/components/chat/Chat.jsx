@@ -1,9 +1,9 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import MessageBubble from "./MessageBubble";
 import TypingBubble from "./TypingBubble";
 import ChatInput from "./ChatInput";
 import { useChat } from "../../hooks/useChat";
-import { FiChevronRight, FiRefreshCw } from "react-icons/fi";
+import { FiChevronRight, FiRefreshCw, FiChevronLeft } from "react-icons/fi";
 
 export default function Chat({ initialQuery }) {
   const {
@@ -13,10 +13,11 @@ export default function Chat({ initialQuery }) {
     error,
     loadingChat,
     loadingArticles,
-		reset,
+    reset,
   } = useChat();
   const bottomRef = useRef(null);
   const hasSentInitial = useRef(false);
+  const [selectedArticle, setSelectedArticle] = useState(null);
 
   const hasArticles = articles.length > 0;
 
@@ -38,8 +39,6 @@ export default function Chat({ initialQuery }) {
     return (
       <ul className="space-y-2">
         {articles.map((a, idx) => {
-          const href =
-            a.url || (a.doi ? `https://doi.org/${a.doi}` : undefined);
           const meta = [a.year, a.journal].filter(Boolean).join(" • ");
           const summary = a.summary || a.abstract || a.snippet;
           const key = a.pmid ?? a.doi ?? `${a.title ?? "article"}-${idx}`;
@@ -63,20 +62,14 @@ export default function Chat({ initialQuery }) {
 
           return (
             <li key={key}>
-              {href ? (
-                <a
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group flex items-start justify-between rounded-xl border border-[#2A3238] bg-[#161B21] px-4 py-3 hover:border-[#379DA6] hover:bg-[#1E252C]"
-                >
-                  {content}
-                </a>
-              ) : (
-                <div className="group flex items-start justify-between rounded-xl border border-[#2A3238] bg-[#161B21] px-4 py-3">
-                  {content}
-                </div>
-              )}
+              <button
+                type="button"
+                onClick={() => setSelectedArticle(a)}
+                className="group flex w-full items-start justify-between rounded-xl border border-[#2A3238] bg-[#161B21] px-4 py-3 text-left hover:border-[#379DA6] hover:bg-[#1E252C]"
+                aria-label={`Open details for ${a.title ?? "article"}`}
+              >
+                {content}
+              </button>
             </li>
           );
         })}
@@ -110,72 +103,141 @@ export default function Chat({ initialQuery }) {
 
   return (
     <section className="h-[84vh] md:h-[86vh] w-full flex flex-col gap-3 py-6 overflow-hidden md:flex-row">
-      <div
-        id="main-chat-box"
-        className="h-2/3  md:h-full md:w-2/3 flex flex-col overflow-hidden rounded-2xl border border-[#2A3238] bg-[#1C2026] p-3"
-      >
-        <header
-          id="chat-header"
-          className="mb-3 flex items-center justify-between gap-2 border-b border-[#2A3238] pb-3"
-        >
-          <div>
-            <p className="text-[11px] uppercase tracking-wide text-[#9AA4AB]">
-              Conversation
-            </p>
-            <h2 className="text-sm font-semibold text-[#E6E8EA]">
-              NASA Research Assistant
-            </h2>
-          </div>
-          <span className="inline-flex items-center gap-2 rounded-full border border-[#2A3238] px-3 py-1 text-[11px] text-[#9AA4AB]">
-            <span
-              className={`h-2 w-2 rounded-full ${
-                loadingChat ? "bg-[#379DA6] animate-pulse" : "bg-[#38F8AC]"
-              }`}
-            />
-            Live
-          </span>
-        </header>
-
-        <ul
-          id="messages-list"
-          className="flex-1 overflow-y-auto overscroll-y-contain touch-pan-y pr-1 space-y-0.5 flex flex-col"
-        >
-          {messages.map(
-            (m, i) =>
-              m.role !== "system" && (
-                <MessageBubble
-                  key={i}
-                  msg={m}
-                />
-              )
-          )}
-          {loadingChat && <TypingBubble />}
-          <div ref={bottomRef} />
-        </ul>
-
+      {!selectedArticle ? (
         <div
-          id="chat-input-container"
-          className="pt-3"
+          id="main-chat-box"
+          className="h-2/3  md:h-full md:w-2/3 flex flex-col overflow-hidden rounded-2xl border border-[#2A3238] bg-[#1C2026] p-3"
         >
-          <ChatInput
-            onSend={makePrompt}
-            disabled={loadingArticles || loadingChat}
-          />
-          <div className="mt-2 flex flex-wrap items-center justify-between text-[11px] text-[#9AA4AB]">
-            <span>Enter to send • Shift+Enter for newline</span>
-            <button
-              type="button"
-              onClick={reset}
-              disabled={loadingArticles || loadingChat || messages.length <= 1}
-              className={`inline-flex items-center gap-1 rounded-lg border border-[#2A3238] px-2.5 py-1 text-xs text-[#E6E8EA] 
+          <header
+            id="chat-header"
+            className="mb-3 flex items-center justify-between gap-2 border-b border-[#2A3238] pb-3"
+          >
+            <div>
+              <p className="text-[11px] uppercase tracking-wide text-[#9AA4AB]">
+                Conversation
+              </p>
+              <h2 className="text-sm font-semibold text-[#E6E8EA]">
+                NASA Research Assistant
+              </h2>
+            </div>
+            <span className="inline-flex items-center gap-2 rounded-full border border-[#2A3238] px-3 py-1 text-[11px] text-[#9AA4AB]">
+              <span
+                className={`h-2 w-2 rounded-full ${
+                  loadingChat ? "bg-[#379DA6] animate-pulse" : "bg-[#38F8AC]"
+                }`}
+              />
+              Live
+            </span>
+          </header>
+
+          <ul
+            id="messages-list"
+            className="flex-1 overflow-y-auto overscroll-y-contain touch-pan-y pr-1 space-y-0.5 flex flex-col"
+          >
+            {messages.map(
+              (m, i) =>
+                m.role !== "system" && (
+                  <MessageBubble
+                    key={i}
+                    msg={m}
+                  />
+                )
+            )}
+            {loadingChat && <TypingBubble />}
+            <div ref={bottomRef} />
+          </ul>
+
+          <div
+            id="chat-input-container"
+            className="pt-3"
+          >
+            <ChatInput
+              onSend={makePrompt}
+              disabled={loadingArticles || loadingChat}
+            />
+            <div className="mt-2 flex flex-wrap items-center justify-between text-[11px] text-[#9AA4AB]">
+              <span>Enter to send • Shift+Enter for newline</span>
+              <button
+                type="button"
+                onClick={reset}
+                disabled={loadingArticles || loadingChat || messages.length <= 1}
+                className={`inline-flex items-center gap-1 rounded-lg border border-[#2A3238] px-2.5 py-1 text-xs text-[#E6E8EA] 
     hover:border-[#379DA6] hover:text-[#379DA6] 
     disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none`}
-            >
-              New inquiry
-            </button>
+              >
+                New inquiry
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      ) : (
+        <div
+          id="article-details"
+          className="h-2/3 md:h-full md:w-2/3 flex flex-col min-h-0 overflow-hidden rounded-2xl border border-[#2A3238] bg-[#1C2026] p-3"
+        >
+          <div className="mb-3 grid grid-cols-[auto,1fr,auto] items-center gap-2 border-b border-[#2A3238] pb-3">
+            <button
+              type="button"
+              onClick={() => setSelectedArticle(null)}
+              className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-[#2A3238] text-[#E6E8EA] hover:border-[#379DA6] hover:text-[#379DA6]"
+              aria-label="Back to chat"
+              title="Back"
+            >
+              <FiChevronLeft />
+            </button>
+            <h2 className="text-sm font-semibold text-[#E6E8EA] text-center truncate">
+              {selectedArticle.title ?? "Untitled source"}
+            </h2>
+            <span aria-hidden className="h-8 w-8" />
+          </div>
+
+          <div className="flex-1 min-h-0 overflow-y-auto pr-1">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-3">
+                <h3 className="text-xs uppercase tracking-wide text-[#9AA4AB]">
+                  TL; DR
+                </h3>
+                <p className="text-sm text-[#C9C9C9]">
+                  {selectedArticle.tl_dr ?? "—"}
+                </p>
+
+                <h4 className="text-xs uppercase tracking-wide text-[#9AA4AB]">
+                  Key terms
+                </h4>
+                <p className="text-sm text-[#C9C9C9]">
+                  {Array.isArray(selectedArticle.key_terms)
+                    ? selectedArticle.key_terms.join(", ")
+                    : selectedArticle.key_terms ?? "—"}
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                <h3 className="text-xs uppercase tracking-wide text-[#9AA4AB]">
+                  Authors
+                </h3>
+                <p className="text-sm text-[#C9C9C9]">
+                  {(() => {
+                    const list = Array.isArray(selectedArticle.authors)
+                      ? selectedArticle.authors.slice(0, 3)
+                      : [];
+                    if (list.length === 0) return "—";
+                    return `${list.join(", ")}, et al.`;
+                  })()}
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-5">
+              <h3 className="text-xs uppercase tracking-wide text-[#9AA4AB]">
+                Abstract
+              </h3>
+              <p className="mt-2 text-sm text-[#C9C9C9] whitespace-pre-wrap">
+                {selectedArticle.abstract ?? "—"}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       <aside
         id="references-panel"
