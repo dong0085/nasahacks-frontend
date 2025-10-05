@@ -6,16 +6,12 @@ import { useChat } from '../../hooks/useChat';
 import { FiChevronRight, FiRefreshCw } from 'react-icons/fi';
 
 export default function Chat({ initialQuery }) {
-	const { messages, articles, makePrompt, fetchArticles, error, loading } = useChat();
+	const { messages, articles, makePrompt, error, loading, fetchArticles } = useChat();
 	const bottomRef = useRef(null);
 	const hasSentInitial = useRef(false);
 
 	const hasArticles = articles.length > 0;
 
-	const handleSend = async (prompt) => {
-		await makePrompt(prompt);
-		fetchArticles();
-	};
 
 	const renderArticles = () => {
 		if (loading && !hasArticles) {
@@ -68,7 +64,7 @@ export default function Chat({ initialQuery }) {
 	useEffect(() => {
 		if (initialQuery && !hasSentInitial.current) {
 			hasSentInitial.current = true;
-			handleSend(initialQuery);
+			makePrompt(initialQuery);
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [initialQuery]);
@@ -104,12 +100,12 @@ export default function Chat({ initialQuery }) {
 				</ul>
 
 				<div id="chat-input-container" className="pt-3">
-					<ChatInput onSend={handleSend} disabled={loading} />
+					<ChatInput onSend={makePrompt} disabled={loading} />
 					<div className="mt-2 flex flex-wrap items-center justify-between text-[11px] text-[#9AA4AB]">
 						<span>Enter to send • Shift+Enter for newline</span>
 						<button
 							type="button"
-							onClick={fetchArticles}
+							onClick={() => {console.log('do something here')}}
 							disabled={loading}
 							className="inline-flex items-center gap-1 rounded-lg border border-[#2A3238] px-2.5 py-1 text-xs text-[#E6E8EA] hover:border-[#379DA6] hover:text-[#379DA6] disabled:opacity-40 lg:hidden"
 						>
